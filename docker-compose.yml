@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: docrag-postgres
+    environment:
+      POSTGRES_USER: docrag
+      POSTGRES_PASSWORD: docrag
+      POSTGRES_DB: docrag
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docrag"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    profiles: ["deployment"]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: docrag-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./backend_storage:/app/storage
+      - paddle_models:/root/.paddleocr
+    env_file:
+      - ./backend/.env
+    networks:
+      - default
+      - milvus
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  paddle_models:
+
+networks:
+  milvus:
+    external: true
