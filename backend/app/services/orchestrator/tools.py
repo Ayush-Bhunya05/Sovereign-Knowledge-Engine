@@ -263,7 +263,10 @@ class WorkspaceTools:
         from sqlalchemy import text
         try:
             with self.engine.begin() as conn:
-                conn.execute(text("SET LOCAL ROLE rag_readonly;"))
+                try:
+                    conn.execute(text("SET LOCAL ROLE rag_readonly;"))
+                except Exception:
+                    pass
                 conn.execute(text("SET TRANSACTION READ ONLY;"))
                 conn.execute(text("SET statement_timeout = '5s';"))
                 

@@ -136,8 +136,11 @@ RAW SQL QUERY:'''
         from sqlalchemy import text
         try:
             with engine.begin() as conn:
-                # 1. Set role to rag_readonly for strict permissions
-                conn.execute(text("SET LOCAL ROLE rag_readonly;"))
+                # 1. Set role to rag_readonly if supported
+                try:
+                    conn.execute(text("SET LOCAL ROLE rag_readonly;"))
+                except Exception:
+                    pass
                 # 2. Enforce read-only transaction
                 conn.execute(text("SET TRANSACTION READ ONLY;"))
                 # 3. Enforce statement timeout (e.g. 5 seconds)

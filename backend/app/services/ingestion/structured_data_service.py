@@ -169,9 +169,12 @@ class StructuredDataService:
                 # Use engine to write to DB, replace if exists (for re-runs)
                 df.to_sql(table_name, con=engine, if_exists="replace", index=False)
                 
-                # 4. Apply read_only permissions explicitly
-                with engine.begin() as conn:
-                    conn.execute(text(f'GRANT SELECT ON TABLE "{table_name}" TO rag_readonly;'))
+                # 4. Apply read_only permissions explicitly (if role exists)
+                try:
+                    with engine.begin() as conn:
+                        conn.execute(text(f'GRANT SELECT ON TABLE "{table_name}" TO rag_readonly;'))
+                except Exception as perm_err:
+                    logger.warning("Could not grant SELECT to rag_readonly: %s", perm_err)
                 
                 # Register dataset
                 db.add(dataset)
