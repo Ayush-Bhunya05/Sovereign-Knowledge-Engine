@@ -100,12 +100,12 @@ class AssetService:
         # Delete file from storage
         self.storage.delete(asset.storage_path)
         
-        # Delete vectors from Milvus
+        # Delete vectors from Vector DB
         if self.orchestrator and self.orchestrator.milvus:
             try:
                 self.orchestrator.milvus.delete_asset_vectors(str(asset_id))
             except Exception as e:
-                print(f"Warning: Failed to delete Milvus vectors for asset {asset_id}: {e}")
+                print(f"Warning: Failed to delete vectors for asset {asset_id}: {e}")
         
         db.delete(asset)
         db.commit()

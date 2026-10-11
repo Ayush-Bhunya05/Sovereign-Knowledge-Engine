@@ -40,13 +40,14 @@ def flush_all():
     finally:
         db.close()
 
-    print("2. Flushing Milvus database...")
+    print("2. Flushing Vector database...")
     try:
-        milvus = MilvusService(host=settings.milvus_host, port=settings.milvus_port)
-        milvus.recreate_collection()
-        print("Milvus collection recreated and flushed.")
+        from app.dependencies import get_vector_service
+        vector_service = get_vector_service()
+        vector_service.recreate_collection()
+        print(f"Vector collection recreated and flushed ({type(vector_service).__name__}).")
     except Exception as e:
-        print(f"Error flushing Milvus: {e}")
+        print(f"Error flushing Vector DB: {e}")
         
     print("3. Flushing local uploads directory...")
     try:

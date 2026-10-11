@@ -34,13 +34,13 @@ function HealthDashboard() {
           DB: {health.database || 'unknown'}
         </span>
         <span className="health-item">
-          <span className={`status-dot ${health.milvus?.status === 'ok' ? 'ok' : 'error'}`}></span>
-          Milvus: {health.milvus?.status || 'unknown'}
+          <span className={`status-dot ${(health.vector_db?.status || health.milvus?.status) === 'ok' ? 'ok' : 'error'}`}></span>
+          Vector DB: {health.vector_db?.status || health.milvus?.status || 'unknown'}
         </span>
       </div>
       <div>
-        {health.milvus?.entity_count !== undefined && (
-          <span className="health-vectors">Total Vectors: {health.milvus.entity_count}</span>
+        {(health.vector_db?.entity_count ?? health.milvus?.entity_count) !== undefined && (
+          <span className="health-vectors">Total Vectors: {health.vector_db?.entity_count ?? health.milvus?.entity_count}</span>
         )}
       </div>
     </div>

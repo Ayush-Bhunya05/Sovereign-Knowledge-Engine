@@ -29,15 +29,15 @@ def reset_dev():
                 shutil.rmtree(item)
     print("Local uploads cleared.")
 
-    # 3. Drop and recreate Milvus collection
-    print("Resetting Milvus collection...")
-    milvus = MilvusService(
-        host=settings.milvus_host,
-        port=settings.milvus_port,
-    )
-    # Recreate collection drops the existing one implicitly
-    milvus.recreate_collection()
-    print("Milvus collection reset successfully.")
+    # 3. Drop and recreate Vector collection
+    print("Resetting Vector collection...")
+    try:
+        from app.dependencies import get_vector_service
+        vector_service = get_vector_service()
+        vector_service.recreate_collection()
+        print(f"Vector collection reset successfully ({type(vector_service).__name__}).")
+    except Exception as e:
+        print(f"Failed to reset Vector DB: {e}")
 
     print("Development environment has been completely reset.")
 

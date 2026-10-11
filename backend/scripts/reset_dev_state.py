@@ -79,15 +79,14 @@ def run_alembic():
     print("Alembic upgrade successful.")
 
 def reset_milvus():
-    print("Resetting Milvus collection...")
-    settings = get_settings()
-    # If milvus isn't running, this will log an error but won't crash if we catch it
+    print("Resetting Vector collection...")
     try:
-        milvus = MilvusService(host=settings.milvus_host, port=settings.milvus_port)
-        milvus.recreate_collection()
-        print("Milvus reset successful.")
+        from app.dependencies import get_vector_service
+        vector_service = get_vector_service()
+        vector_service.recreate_collection()
+        print(f"Vector collection reset successful ({type(vector_service).__name__}).")
     except Exception as e:
-        print(f"Failed to reset Milvus: {e}")
+        print(f"Failed to reset Vector DB: {e}")
 
 def reset_uploads():
     print("Resetting uploads directory...")

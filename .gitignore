@@ -17,8 +17,12 @@ env/
 # Environment files
 .env
 
-# Uploads (local storage)
+# Uploads & Vector DB Storage (local storage)
 backend/uploads/
+uploads/
+backend/storage/
+storage/
+*.sqlite3
 
 # IDE
 .vscode/

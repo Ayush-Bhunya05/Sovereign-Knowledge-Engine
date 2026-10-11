@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v2.router import api_router as api_router_v2
 from app.config import get_settings
 from app.database import engine
-from app.dependencies import get_embedding_service, get_milvus_service
+from app.dependencies import get_embedding_service, get_vector_service
 from app.models.base import Base
 
 # Ensure all models are imported so Base.metadata is populated.
@@ -36,10 +36,10 @@ async def lifespan(application: FastAPI):
     Path(settings.upload_dir).mkdir(parents=True, exist_ok=True)
     logger.info("Upload directory ready: %s", settings.upload_dir)
 
-    # Pre-load embedding model into memory and init Milvus
+    # Pre-load embedding model into memory and init Vector DB (ChromaDB)
     logger.info("Initializing vector services...")
     get_embedding_service()
-    get_milvus_service()
+    get_vector_service()
     logger.info("Vector services ready.")
 
     yield  # application runs

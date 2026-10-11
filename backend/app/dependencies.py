@@ -15,6 +15,7 @@ from app.services.ingestion.chunking_service import ChunkingService
 from app.services.embedding_service import EmbeddingService
 from app.services.ingestion.extraction_service import ExtractionService
 from app.services.milvus_service import MilvusService
+from app.services.chroma_service import ChromaService
 from app.services.ingestion.orchestrator import IngestionOrchestrator
 from app.services.asset_service import AssetService
 from app.services.storage_service import LocalStorageService
@@ -71,19 +72,33 @@ def get_embedding_service() -> EmbeddingService:
 
 
 @lru_cache
-def get_milvus_service() -> MilvusService:
+def get_chroma_service() -> ChromaService:
     settings = get_settings()
-    return MilvusService(
-        host=settings.milvus_host,
-        port=settings.milvus_port,
-    )
+    return ChromaService(persist_dir=settings.chroma_persist_dir)
+
+
+@lru_cache
+def get_vector_service() -> ChromaService | MilvusService:
+    settings = get_settings()
+    if settings.vector_db_provider.lower() == "milvus":
+        return MilvusService(
+            host=settings.milvus_host,
+            port=settings.milvus_port,
+        )
+    return get_chroma_service()
+
+
+@lru_cache
+def get_milvus_service() -> ChromaService | MilvusService:
+    """Backward-compatible dependency alias pointing to active vector service."""
+    return get_vector_service()
 
 
 @lru_cache
 def get_structured_data_service() -> StructuredDataService:
     return StructuredDataService(
         embedding_service=get_embedding_service(),
-        milvus_service=get_milvus_service(),
+        milvus_service=get_vector_service(),
     )
 
 
@@ -94,7 +109,7 @@ def get_ingestion_orchestrator() -> IngestionOrchestrator:
         extraction_service=get_extraction_service(),
         chunking_service=get_chunking_service(),
         embedding_service=get_embedding_service(),
-        milvus_service=get_milvus_service(),
+        milvus_service=get_vector_service(),
         storage_service=get_storage_service(),
         structured_data_service=get_structured_data_service(),
     )
@@ -111,7 +126,7 @@ def get_asset_service() -> AssetService:
 @lru_cache
 def get_search_service() -> SearchService:
     return SearchService(
-        milvus_service=get_milvus_service(),
+        milvus_service=get_vector_service(),
         embedding_service=get_embedding_service()
     )
 

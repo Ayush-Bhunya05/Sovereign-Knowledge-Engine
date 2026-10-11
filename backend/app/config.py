@@ -31,7 +31,9 @@ class Settings(BaseSettings):
     # Database --------------------------------------------------------------
     database_url: str = "postgresql://docrag:docrag@localhost:5433/docrag"
 
-    # Milvus (Phase 3 -> Sprint 2.2) -----------------------------------------
+    # Vector Database (ChromaDB / Milvus) ----------------------------------
+    vector_db_provider: str = "chroma"
+    chroma_persist_dir: str = "chroma_db"
     milvus_host: str = "localhost"
     milvus_port: int = 19530
     embedding_model_name: str = "BAAI/bge-small-en-v1.5"
